@@ -1,0 +1,11 @@
+1. WHERE THE DATA WOULD COME FROM:
+
+The plan is to collect the data for the project through the YouTube Data API, which is free (up to a daily limit) for research/academic purposes.
+
+2. HOW IT WOULD BE COLLECTED:
+
+I am writing a script for this purpose, and that will pull the comments data from youtube videos posted about the game "ARC Raiders" since its release.
+
+3. KNOWN LIMITATIONS:
+
+Storing the collectd data, as well the API rate limits are known limitations for this project. Another limitation I expect to hit is whether enough comments and videos are posted now (a couple of months after release) for me to analyse.
