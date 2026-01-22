@@ -11,7 +11,7 @@ __pycache__/
 *$py.class
 
 # Virtual Environment
-venv/
+.venv/
 
 # Data exports
 data/
