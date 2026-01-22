@@ -7,7 +7,7 @@ from database import SessionLocal, Video, CollectionState
 
 load_dotenv()
 API_KEY = os.getenv("YOUTUBE_API_KEY")
-KEYWORDS = ["Arc Raiders", "Arc Raiders gameplay", "Arc Raiders review", "#ArcRaiders"]
+KEYWORDS = ["Arc Raiders", "Arc Raiders gameplay", "Arc Raiders review", "#ArcRaiders", "ARC RAIDERS", "arc raiders"]
 
 def get_youtube_client():
     return build("youtube", "v3", developerKey=API_KEY)
