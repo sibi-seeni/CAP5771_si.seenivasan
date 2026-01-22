@@ -1,7 +1,5 @@
 import logging
-from datetime import datetime
-from discovery import search_new_videos
-from collector import collect_comments
+from src import init_db, search_new_videos, collect_comments, load_data
 
 # Setting up Logging
 # Stores logs in a file for documentation
