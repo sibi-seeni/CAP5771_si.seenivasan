@@ -1,4 +1,19 @@
+# Environment Variables
 .env
-.DS_Store
-*.pdf
-.venv
+
+# Database files
+*.db
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+
+# Data exports
+data/
+*.csv
+*.json
