@@ -15,6 +15,6 @@ __pycache__/
 
 # Data exports
 data/
-*.txt
+collection_log.txt
 *.csv
 *.json
