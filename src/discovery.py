@@ -3,7 +3,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from sqlalchemy.orm import Session
-from database import SessionLocal, Video, CollectionState
+from .database import SessionLocal, Video, CollectionState
 
 load_dotenv()
 API_KEY = os.getenv("YOUTUBE_API_KEY")

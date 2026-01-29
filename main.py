@@ -1,5 +1,5 @@
 import logging
-from src import init_db, search_new_videos, collect_comments, load_data
+from src import init_db, search_new_videos, collect_comments#, load_data
 
 # Setting up Logging
 # Stores logs in a file for documentation
