@@ -1,6 +1,9 @@
 # Environment Variables
 .env
 
+# MacOS files
+.DS_Store
+
 # Database files
 *.db
 *.sqlite3
