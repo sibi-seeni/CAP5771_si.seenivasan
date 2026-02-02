@@ -1,0 +1,2 @@
+02/02/2026 
+  Great job at keeping up with the project! make sure to include a diagram.png, I could see some of your tables from the database.py, however a diagram would be easier. 
