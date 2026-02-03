@@ -17,3 +17,36 @@ The primary unstructured data in this project consists of the `text` column in t
     * **Languages:** I have not decided yet to handle comments in other languages apart from English, whehter to drop them, or keep them for added metrics.
     * **Sentiment Extraction:** I will transform this unstructured text into structured "Sentiment Scores" (Numerical) to be stored in a future table.
 * **Ethical Handling:** User identities are treated as sensitive; the `author_hash` variable is used to anonymize users while still allowing for the analysis of unique contributors.
+
+## ER Diagram
+
+```mermaid
+erDiagram
+    VIDEOS {
+        string video_id PK
+        string title
+        text description
+        string channel_id
+        datetime published_at
+        string keyword_matched
+        datetime first_seen_at
+        boolean comments_disabled
+    }
+
+    COMMENTS {
+        string comment_id PK
+        string video_id FK
+        string parent_id
+        string author_hash
+        text text
+        datetime published_at
+        datetime last_updated_at
+    }
+
+    COLLECTION_STATE {
+        string keyword PK
+        datetime last_search_time
+    }
+
+    VIDEOS ||--o{ COMMENTS : has
+```
