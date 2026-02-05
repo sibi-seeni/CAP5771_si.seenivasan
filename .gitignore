@@ -21,3 +21,7 @@ data/
 collection_log.txt
 *.csv
 *.json
+
+# Code Editor files
+.vscode/
+.ipynb_checkpoints/
