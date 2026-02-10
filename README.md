@@ -10,22 +10,23 @@ The study period covers the game's launch (October 30, 2025) through the present
 
 ---
 
-## 🏗 Repository Structure
+## Repository Structure
 
 ```text
 arc-raiders-sentiment/
 ├── data/                   # (Git-ignored) Stores SQLite DB and CSV exports
-├── collection_log.txt      # (Git-ignored) Pipeline execution logs for reproducibility
-├── src/                    # Source Code
+├── collection_log.txt      # (Git-ignored) Pipeline execution logs
+├── src/                    # Source Code for Data Acquisition
 │   ├── __init__.py         # Package initialization
 │   ├── database.py         # Phase 3: SQLAlchemy models & SQLite schema
-│   ├── discovery.py        # Phase 2: Automated video discovery logic
-│   └── collector.py        # Phase 2: Comment scraping & anonymization
+│   ├── discovery.py        # Phase 2: Automated video discovery
+│   └── collector.py        # Phase 2: Comment scraping
 ├── .env                    # (Git-ignored) YOUTUBE_API_KEY
 ├── .gitignore              # Ensures sensitive/large data is not pushed to GitHub
 ├── main.py                 # Pipeline orchestrator (Entry Point)
+├── EDA.ipynb               # Jupyter Notebook that contains the data exploration
 ├── requirements.txt        # Project dependencies
-└── README.md               # Project documentation & methodology
+└── README.md               # Project documentation
 
 ```
 
@@ -33,13 +34,15 @@ arc-raiders-sentiment/
 
 ## Methodology & Progress
 
-The following phases have been successfully implemented:
-
 ### Data Engineering (Phases 2-3)
 
 * **Incremental Discovery:** Implemented a state-aware search logic that tracks `last_search_time` to avoid redundant API calls and manage daily quotas.
 * **Data Privacy (Ethics):** As I am planning to work towards an article, all user identifiers are anonymized using **SHA-256 hashing** (`author_hash`) before storage to ensure data minimization.
 * **Database Infrastructure:** Built a relational SQLite schema using SQLAlchemy to handle video-comment relationships and maintain search state. Implemented 2-layer deduplication (Memory Set + DB Unique Constraints).
+
+### Data Exploration (Phase 4)
+
+* **Loading the database:** SQL Joins were performed on the stored data to load into CSVs.
 
 ### Future Steps: Natural Language Processing
 
@@ -99,9 +102,11 @@ python3 main.py
 ## Expected Outputs
 
 * **`arc_raiders_sentiment.db`**: A local database containing thousands of categorized comments.
+* **`videos.csv`**:
+* **`comments.csv`**:
 * **`collection_log.txt`**: A detailed log of API quota usage and video discovery counts.
 * **`sentiment_trend.png`**: A visualization showing the weekly sentiment fluctuations relative to the game's major milestones.
-* **`arc_raiders_final_analysis.csv`**: A clean dataset ready for advanced statistical modeling in R or Python.
+* **`arc_raiders_final_analysis.csv`**: A clean dataset ready for advanced modeling in Python.
 
 ---
 
