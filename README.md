@@ -34,11 +34,50 @@ arc-raiders-sentiment/
 
 ## Methodology & Progress
 
+### Data Source: The YouTube Data API v3
+
+The primary data for this study was retrieved using the YouTube Data API v3, a RESTful interface provided by Google that allows for the systematic collection of video metadata and user-generated comments. For this project, the API was leveraged to perform **keyword-based discovery** of Arc Raiders content and to conduct deep-crawl extractions of **associated comment threads** for sentiment analysis.
+
+In the current landscape of computational social science, the YouTube Data API represents a critical resource, as it remains one of the last prominent, high-fidelity social media APIs accessible to researchers without the prohibitive costs or restrictive access tiers recently implemented by platforms such as X (formerly Twitter) and Reddit.
+
 ### Data Engineering (Phases 2-3)
 
 * **Incremental Discovery:** Implemented a state-aware search logic that tracks `last_search_time` to avoid redundant API calls and manage daily quotas.
 * **Data Privacy (Ethics):** As I am planning to work towards an article, all user identifiers are anonymized using **SHA-256 hashing** (`author_hash`) before storage to ensure data minimization.
 * **Database Infrastructure:** Built a relational SQLite schema using SQLAlchemy to handle video-comment relationships and maintain search state. Implemented 2-layer deduplication (Memory Set + DB Unique Constraints).
+
+#### ER Diagram
+
+```mermaid
+erDiagram
+    VIDEOS {
+        string video_id PK
+        string title
+        text description
+        string channel_id
+        datetime published_at
+        string keyword_matched
+        datetime first_seen_at
+        boolean comments_disabled
+    }
+
+    COMMENTS {
+        string comment_id PK
+        string video_id FK
+        string parent_id
+        string author_hash
+        text text
+        datetime published_at
+        datetime last_updated_at
+    }
+
+    COLLECTION_STATE {
+        string keyword PK
+        datetime last_search_time
+    }
+
+    VIDEOS ||--o{ COMMENTS : has
+```
 
 ### Data Exploration (Phase 4)
 
