@@ -49,6 +49,11 @@ In the current landscape of computational social science, the YouTube Data API r
 #### ER Diagram
 
 ```mermaid
+%%{init: {
+  "themeVariables": {
+    "fontSize": "9px"
+  }
+}}%%
 erDiagram
     VIDEOS {
         string video_id PK
