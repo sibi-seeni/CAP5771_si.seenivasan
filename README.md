@@ -114,22 +114,39 @@ This prevents viral outliers from skewing trends while ensuring highly-voted com
 ```bash
 git clone https://github.com/yourusername/arc-raiders-sentiment.git
 cd arc-raiders-sentiment
+````
 
-```
+2. **Create a virtual environment with uv:**
 
-
-2. **Install dependencies:**
 ```bash
-pip install -r requirements.txt
-
+uv venv .venv
 ```
 
+3. **Activate the virtual environment:**
 
-3. **Configure Environment:**
-Create a `.env` file in the root directory and add your key:
+* **macOS / Linux:**
+
+```bash
+source .venv/bin/activate
+```
+
+* **Windows (PowerShell):**
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+4. **Install dependencies using uv:**
+
+```bash
+uv pip install -r requirements.txt
+```
+
+5. **Configure Environment:**
+   Create a `.env` file in the root directory and add your key:
+
 ```text
 YOUTUBE_API_KEY=your_actual_key_here
-
 ```
 
 
