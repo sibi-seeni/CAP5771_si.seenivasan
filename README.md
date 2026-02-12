@@ -14,19 +14,20 @@ The study period covers the game's launch (October 30, 2025) through the present
 
 ```text
 arc-raiders-sentiment/
-├── data/                   # (Git-ignored) Stores SQLite DB and CSV exports
-├── collection_log.txt      # (Git-ignored) Pipeline execution logs
-├── src/                    # Source Code for Data Acquisition
-│   ├── __init__.py         # Package initialization
-│   ├── database.py         # Phase 3: SQLAlchemy models & SQLite schema
-│   ├── discovery.py        # Phase 2: Automated video discovery
-│   └── collector.py        # Phase 2: Comment scraping
-├── .env                    # (Git-ignored) YOUTUBE_API_KEY
-├── .gitignore              # Ensures sensitive/large data is not pushed to GitHub
-├── main.py                 # Pipeline orchestrator (Entry Point)
-├── EDA.ipynb               # Jupyter Notebook that contains the data exploration
-├── requirements.txt        # Project dependencies
-└── README.md               # Project documentation
+├── diary/                   # Diary entries for CAP5771
+├── src/                     # Source Code for Data Acquisition
+│   ├── __init__.py          # Package initialization
+│   ├── database.py          # Phase 3: SQLAlchemy models & SQLite schema
+│   ├── discovery.py         # Phase 2: Automated video discovery
+│   └── collector.py         # Phase 2: Comment scraping
+├── .env                     # (Git-ignored) YOUTUBE_API_KEY
+├── .gitignore               # Ensures sensitive/large data is not pushed to GitHub
+├── collection_log.txt       # (Git-ignored) Pipeline execution logs
+├── arc-raiders-sentiment.db # (Git-ignored) SQLite3 Database to store all collected data
+├── main.py                  # Pipeline orchestrator (Entry Point)
+├── EDA.ipynb                # Jupyter Notebook that contains the data exploration
+├── requirements.txt         # Project dependencies
+└── README.md                # Project documentation
 
 ```
 
@@ -34,7 +35,7 @@ arc-raiders-sentiment/
 
 ## Methodology & Progress
 
-### Data Source: The YouTube Data API v3
+### Data Source: The YouTube Data API v3 (Phase 1)
 
 The primary data for this study was retrieved using the YouTube Data API v3, a RESTful interface provided by Google that allows for the systematic collection of video metadata and user-generated comments. For this project, the API was leveraged to perform **keyword-based discovery** of Arc Raiders content and to conduct deep-crawl extractions of **associated comment threads** for sentiment analysis.
 
@@ -104,7 +105,7 @@ This prevents viral outliers from skewing trends while ensuring highly-voted com
 ### 1. Prerequisites
 
 * Python 3.10+
-* A Google Cloud Project with the **YouTube Data API v3** enabled.
+* A Google Cloud Project with the **[YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started)** enabled.
 * An API Key.
 
 ### 2. Setup
@@ -146,11 +147,7 @@ python3 main.py
 ## Expected Outputs
 
 * **`arc_raiders_sentiment.db`**: A local database containing thousands of categorized comments.
-* **`videos.csv`**:
-* **`comments.csv`**:
 * **`collection_log.txt`**: A detailed log of API quota usage and video discovery counts.
-* **`sentiment_trend.png`**: A visualization showing the weekly sentiment fluctuations relative to the game's major milestones.
-* **`arc_raiders_final_analysis.csv`**: A clean dataset ready for advanced modeling in Python.
 
 ---
 
@@ -158,7 +155,7 @@ python3 main.py
 
 * **Guo, C., et al. (2017).** *On Calibration of Modern Neural Networks.* ICML. (Validation for Confidence Scoring).
 * **Giachanou, A., & Crestani, F. (2016).** *Like It or Not: A Survey of Twitter Sentiment Analysis Methods.* ACM Computing Surveys. (Validation for Engagement Weighting).
-* **Barbieri, F., et al. (2020).** *TweetEval: Unified Benchmark and Comparative Evaluation for Tweet Classification.* (Base for the RoBERTa model used).
+* **Loureiro, D., et al. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* (Base for the RoBERTa model used).
 
 ---
 
