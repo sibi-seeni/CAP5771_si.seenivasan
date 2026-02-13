@@ -13,7 +13,7 @@ The study period covers the game's launch (October 30, 2025) through the present
 ## Repository Structure
 
 ```text
-arc-raiders-sentiment/
+CAP5771_si.seenivasan/
 ├── diary/                   # Diary entries for CAP5771
 ├── src/                     # Source Code for Data Acquisition
 │   ├── __init__.py          # Package initialization
@@ -112,7 +112,7 @@ This prevents viral outliers from skewing trends while ensuring highly-voted com
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/arc-raiders-sentiment.git
+git clone https://github.com/sibi-seeni/CAP5771_si.seenivasan.git
 cd arc-raiders-sentiment
 ````
 
@@ -124,17 +124,9 @@ uv venv .venv
 
 3. **Activate the virtual environment:**
 
-* **macOS / Linux:**
+* **macOS / Linux:** `source .venv/bin/activate`
 
-```bash
-source .venv/bin/activate
-```
-
-* **Windows (PowerShell):**
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
+* **Windows (PowerShell):** `.venv\Scripts\Activate.ps1`
 
 4. **Install dependencies using uv:**
 
@@ -159,6 +151,10 @@ python3 main.py
 
 ```
 
+#### Alternatively:
+
+If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from huggingface: `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory.
+
 ---
 
 ## Expected Outputs
@@ -170,10 +166,10 @@ python3 main.py
 
 ## References
 
+* **Loureiro, D., et al. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* (Base for the RoBERTa model used).
 * **Guo, C., et al. (2017).** *On Calibration of Modern Neural Networks.* ICML. (Validation for Confidence Scoring).
 * **Giachanou, A., & Crestani, F. (2016).** *Like It or Not: A Survey of Twitter Sentiment Analysis Methods.* ACM Computing Surveys. (Validation for Engagement Weighting).
-* **Loureiro, D., et al. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* (Base for the RoBERTa model used).
 
 ---
 
-*This project is submitted as part of the MS in Applied Data Science coursework at University of Florida. It adheres to YouTube API Terms of Service and ethical guidelines regarding public data collection.*
+*This project is submitted as part of the MS in Applied Data Science coursework at the University of Florida. It adheres to YouTube API Terms of Service and ethical guidelines regarding public data collection.*
