@@ -138,7 +138,7 @@ $$\text{Weighted Score} = \text{Sentiment Label} \times \log(1 + \text{Like Coun
 1. **Clone the repository:**
 ```bash
 git clone https://github.com/sibi-seeni/CAP5771_si.seenivasan.git
-cd arc-raiders-sentiment
+cd CAP5771_si.seenivasan
 ````
 
 2. **Create a virtual environment with uv:**
@@ -149,9 +149,9 @@ uv venv .venv
 
 3. **Activate the virtual environment:**
 
-* **macOS / Linux:** `source .venv/bin/activate`
+* macOS / Linux: `source .venv/bin/activate`
 
-* **Windows (PowerShell):** `.venv\Scripts\Activate.ps1`
+* Windows (PowerShell): `.venv\Scripts\Activate.ps1`
 
 4. **Install dependencies using uv:**
 
