@@ -169,12 +169,15 @@ YOUTUBE_API_KEY=your_actual_key_here
 
 ### 3. Execution
 
-To run the full pipeline (Discovery -> Collection -> Analysis -> Plotting), execute the main orchestrator:
+To run the full pipeline (Discovery -> Collection -> Storing), execute the main orchestrator:
 
 ```bash
 python3 main.py
 
 ```
+
+Next, for performing exploratory data analysis, run the Jupyter Notebook `EDA.ipynb` in the main directory.
+
 
 ### 4. Alternative:
 
