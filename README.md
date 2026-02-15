@@ -10,6 +10,29 @@ The study period covers the game's launch (October 30, 2025) through the present
 
 ---
 
+## Table of Contents
+
+* [Project Overview](#project-overview)
+* [Repository Structure](#repository-structure)
+* [Methodology & Progress](#methodology--progress)
+
+  * [Data Source: The YouTube Data API v3 (Phase 1)](#data-source-the-youtube-data-api-v3-phase-1)
+  * [Data Engineering (Phases 2-3)](#data-engineering-phases-2-3)
+
+    * [ER Diagram](#er-diagram)
+  * [Data Exploration (Phase 4)](#data-exploration-phase-4)
+  * [Future Steps: Natural Language Processing](#future-steps-natural-language-processing)
+* [How to Run the Program](#how-to-run-the-program)
+
+  * [1. Prerequisites](#1-prerequisites)
+  * [2. Setup](#2-setup)
+  * [3. Execution](#3-execution)
+  * [4. Alternative](#4-alternative)
+* [Expected Outputs](#expected-outputs)
+* [References](#references)
+
+---
+
 ## Repository Structure
 
 ```text
@@ -87,16 +110,18 @@ erDiagram
 
 ### Data Exploration (Phase 4)
 
-* **Loading the database:** SQL Joins were performed on the stored data to load into CSVs.
+* **Loading the database:** SQL Joins were performed on the stored data to load into pandas DataFrames. 
+* **Text-based analysis:** Examines comment length distributions, word frequency trends, multilingual presence, and sentiment-indicating vocabulary. Special consideration is given to transformer-based NLP constraints, such as the 512-token input limit for RoBERTa, ensuring that the dataset is suitable for downstream modeling. Domain-specific keyword detection provides insight into community discourse and feature-driven discussions.
+* **Time-based analysis:** It revealed some useful insights, like that engagement is highly concentrated, and approximately 14% of total comment volume occurs during statistically significant spike days, largely driven by a small number of high-performing videos. This indicates a heavy-tailed engagement distribution, where a minority of videos account for a disproportionate share of interaction.
+
+Overall, the dataset demonstrates strong potential for sentiment modeling, engagement prediction, and event-driven trend analysis.
 
 ### Future Steps: Natural Language Processing
 
 * **Model Selection:** Utilized `cardiffnlp/twitter-roberta-base-sentiment-latest`, a RoBERTa-base model fine-tuned on 124M tweets, providing superior nuance over lexicon-based methods like VADER.
 * **Confidence Filtering:** Implementing a "Reject Option" based on **Softmax Probability** (Hendrycks & Gimpel, 2016). Only predictions with confidence > 0.70 are utilized for trend analysis to reduce noise.
 * **Interaction Weighting:** To account for community consensus, a **Popularity-Weighted Sentiment** feature will be engineered:
-$$\text{Weighted Score} = \text{Sentiment Label} \times \log(1 + \text{Like Count})$$
-
-This prevents viral outliers from skewing trends while ensuring highly-voted community feedback is prioritized (Giachanou & Crestani, 2016).
+$$\text{Weighted Score} = \text{Sentiment Label} \times \log(1 + \text{Like Count})$$. This prevents viral outliers from skewing trends while ensuring highly-voted community feedback is prioritized (Giachanou & Crestani, 2016).
 
 ---
 
@@ -151,9 +176,9 @@ python3 main.py
 
 ```
 
-#### Alternatively:
+### 4. Alternative:
 
-If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from huggingface: `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory.
+If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from [HuggingFace](https://huggingface.co/datasets/persona-156/arc-raiders-sentiment/tree/main): `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory after cloning (In Step 2).
 
 ---
 
@@ -161,6 +186,7 @@ If you want to skip the data collection pipeline, and directly start from data e
 
 * **`arc_raiders_sentiment.db`**: A local database containing thousands of categorized comments.
 * **`collection_log.txt`**: A detailed log of API quota usage and video discovery counts.
+* **`comments_data.csv`**: The dataframe on which EDA was performed, exported into a CSV for reference.
 
 ---
 
