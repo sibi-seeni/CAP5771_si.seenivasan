@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-My project implements an end-to-end data engineering and NLP pipeline to track community sentiment for the video game **Arc Raiders** (developed by Embark Studios). By utilizing the YouTube Data API v3 and a State-of-the-Art (SOTA) Transformer model, I analyze how sentiment shifts in response to game updates, roadmaps (e.g., the 2026 Roadmap), and seasonal events.
+My project implements an end-to-end data engineering and NLP pipeline to track community sentiment for the video game **Arc Raiders** (developed by Embark Studios). By utilizing the YouTube Data API v3 and with the help of a State-of-the-Art (SOTA) Transformer model down the line, I analyze how sentiment shifts in response to game updates, roadmaps (e.g., the 2026 Roadmap), and seasonal events.
 
 The study period covers the game's launch (October 30, 2025) through the present, providing a longitudinal view of community reception.
 
