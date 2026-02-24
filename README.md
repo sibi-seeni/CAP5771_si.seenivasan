@@ -96,6 +96,7 @@ erDiagram
         string parent_id
         string author_hash
         text text
+        int like_count
         datetime published_at
         datetime last_updated_at
     }
