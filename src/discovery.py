@@ -7,7 +7,7 @@ from .database import SessionLocal, Video, CollectionState
 
 load_dotenv()
 API_KEY = os.getenv("YOUTUBE_API_KEY")
-KEYWORDS = ["Arc Raiders", "Arc Raiders gameplay", "Arc Raiders review", "#ArcRaiders", "ARC RAIDERS", "arc raiders"]
+KEYWORDS = ["Arc Raiders", "Arc Raiders gameplay", "Arc Raiders review", "ARC RAIDERS", "arc raiders"]
 
 def get_youtube_client():
     return build("youtube", "v3", developerKey=API_KEY)
@@ -23,7 +23,7 @@ def search_new_videos():
         state = db.query(CollectionState).filter_by(keyword=keyword).first()
         
         if not state:
-            last_search = datetime(2025, 10, 30)
+            last_search = datetime(201, 12, 09)
             state = CollectionState(keyword=keyword, last_search_time=last_search)
             db.add(state)
         else:
