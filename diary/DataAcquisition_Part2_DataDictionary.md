@@ -24,6 +24,7 @@ This table contains individual comments from accounts linked to each specific vi
 | parent_id          | String    | ID of parent comment (if this is a reply).          | Nullable          |
 | author_hash        | String    | Anonymized author ID for ethical data handling.     |                   |
 | text               | Text      | The raw text content of the comment.                |                   |
+| like_count         | Integer   | Number of likes for the particular comment          | Default: 0        |
 | published_at       | DateTime  | Original comment post date.                         | Default: UTC      |
 | last_updated_at    | DateTime  | Date of last modification (if edited).              | Default: UTC      |
 
@@ -36,3 +37,7 @@ This is an internal tracking table, just for my reference to keep track of when 
 | last_search_time   | DateTime  | Timestamp of the last successful API crawl.         |                   |
 
 ---
+
+## Update 1 (Dated 02/24/2026):
+
+Added like_count column to the `Comments` table.
