@@ -26,9 +26,8 @@ def collect_comments():
     for video in videos:
         print(f"Collecting comments from: {video.title}")
         next_page_token = None
-        # NEW: ID tracker to avoid duplicates within the same video
         added_in_video = set()
-        
+        # ID tracker to avoid duplicates within the same video
         try:
             while True:
                 request = youtube.commentThreads().list(
@@ -41,9 +40,9 @@ def collect_comments():
                 response = request.execute()
 
                 for item in response.get("items", []):
-                    top_comment = item["snippet"]["topLevelComment"]["snippet"]
+                    # Accessing the deeper snippet for likeCount
+                    comment_snippet = item["snippet"]["topLevelComment"]["snippet"]
                     comment_id = item["snippet"]["topLevelComment"]["id"]
-                    
                     # Double check: locally (set) and in the database
                     if comment_id not in added_in_video:
                         exists = db.query(Comment).filter_by(comment_id=comment_id).first()
@@ -51,22 +50,23 @@ def collect_comments():
                             db.add(Comment(
                                 comment_id=comment_id,
                                 video_id=video.video_id,
-                                author_hash=anonymize_id(top_comment.get("authorDisplayName")),
-                                text=top_comment["textDisplay"],
-                                published_at=datetime.strptime(top_comment["publishedAt"], '%Y-%m-%dT%H:%M:%SZ'),
-                                last_updated_at=datetime.strptime(top_comment["updatedAt"], '%Y-%m-%dT%H:%M:%SZ')
+                                author_hash=anonymize_id(comment_snippet.get("authorDisplayName")),
+                                text=comment_snippet["textDisplay"],
+                                # NEW: Capturing Like Count for Interaction Weighting
+                                like_count=comment_snippet.get("likeCount", 0),
+                                published_at=datetime.strptime(comment_snippet["publishedAt"], '%Y-%m-%dT%H:%M:%SZ'),
+                                last_updated_at=datetime.strptime(comment_snippet["updatedAt"], '%Y-%m-%dT%H:%M:%SZ')
                             ))
                             added_in_video.add(comment_id)
                 
                 next_page_token = response.get("nextPageToken")
                 if not next_page_token:
                     break
-            
             # Save this video's comments before moving to the next one
             db.commit()
             
         except Exception as e:
-            db.rollback()  # Clear the transaction in case of error
+            db.rollback() # Clear the transaction in case of error
             if "commentsDisabled" in str(e):
                 print(f"Comments disabled for video {video.video_id}. Skipping.")
                 video.comments_disabled = True
