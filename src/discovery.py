@@ -23,7 +23,7 @@ def search_new_videos():
         state = db.query(CollectionState).filter_by(keyword=keyword).first()
         
         if not state:
-            last_search = datetime(201, 12, 09) # Updating this to the game's announcement
+            last_search = datetime(2021, 12, 10) # Updating this to the game's announcement
             state = CollectionState(keyword=keyword, last_search_time=last_search)
             db.add(state)
         else:
