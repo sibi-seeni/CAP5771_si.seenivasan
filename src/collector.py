@@ -5,7 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from sqlalchemy.orm import Session
-from database import SessionLocal, Video, Comment # Removed the . for local execution compatibility
+from .database import SessionLocal, Video, Comment # Removed the . for local execution compatibility
 
 load_dotenv()
 API_KEY = os.getenv("YOUTUBE_API_KEY")
@@ -55,7 +55,7 @@ def collect_comments():
                 request = youtube.commentThreads().list(
                     part="snippet,replies", 
                     videoId=video.video_id,
-                    maxResults=100,
+                    maxResults=50,
                     pageToken=next_page_token,
                     textFormat="plainText"
                 )
