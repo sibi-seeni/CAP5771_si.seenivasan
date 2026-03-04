@@ -127,28 +127,73 @@ columns_to_keep = [
 
 ---
 
-## Before vs After Example: Engagement Transformation
+## Before vs After Summary (Dataset Structure)
 
-### Before:
+### Before Cleaning (`data.info()`)
 
-* `likes` highly skewed
-* Many zeros
-* Few extreme high values
+```text
+<class 'pandas.DataFrame'>
+RangeIndex: 210486 entries, 0 to 210485
+Data columns (total 27 columns):
 
-### After:
+ 0   comment_id        210486 non-null  str
+ 1   text              210400 non-null  str
+ 2   comment_date      210486 non-null  str
+ 3   author_hash       210486 non-null  str
+ 4   parent_id          46219 non-null  str
+ ...
+12   video_description 192158 non-null  str
+...
+24   language          210486 non-null  str
+```
 
-* `like_count_log` compresses scale
-* Engagement tiers categorize intensity:
+**Key observations before cleaning:**
 
-Example tier bins:
+* 210,486 total rows
+* Missing values in `text` (86 missing)
+* Significant missing values in `video_description`
+* Datetime columns stored as strings
+* 27 total columns (including raw metadata and unused fields)
 
-* `no_likes`
-* `low_engagement`
-* `medium_engagement`
-* `high_engagement`
-* `viral`
+---
 
-This makes modeling more stable and interpretable.
+### After Cleaning + Feature Engineering
+
+```text
+<class 'pandas.DataFrame'>
+Index: 143065 entries, 1 to 192075
+Data columns (total 15 columns):
+
+ 0   comment_id                       143065 non-null  str
+ 1   parent_id                        29931 non-null   str
+ 2   parent_text                      29931 non-null   str
+ 3   text_preprocessed                143065 non-null  str
+ 4   video_context                    143065 non-null  str
+ 5   video_id                         143065 non-null  str
+ 6   comment_date                     143065 non-null  datetime64[us]
+ 7   author_hash                      143065 non-null  str
+ 8   days_from_genai_announcement     143065 non-null  int64
+ 9   days_from_business_model_change  143065 non-null  int64
+10   days_from_game_launch            143065 non-null  int64
+11   mentions_genai                   143065 non-null  bool
+12   mentions_business_model          143065 non-null  bool
+13   likes                            143065 non-null  int64
+14   like_count_log                   143065 non-null  float64
+```
+
+**What changed:**
+
+* Rows reduced from **210,486 → 143,065** after filtering
+* Columns reduced from **27 → 15** (removed unused metadata and redundant fields)
+* All retained text fields now fully non-null
+* `comment_date` successfully converted to `datetime64`
+* Added engineered features:
+
+  * Event-relative day counts
+  * Event mention flags
+  * Log-transformed engagement (`like_count_log`)
+
+> After cleaning and feature selection, the dataset became smaller but structurally stronger. The row count dropped from 210,486 to 143,065 due to removing missing, low-quality, and irrelevant entries. Columns were reduced from 27 to 15, focusing only on variables relevant to sentiment, engagement, and event timing. Datetime fields were properly typed, and engineered features replaced several raw metadata fields, making the dataset more modeling-ready and easier to interpret.
 
 ---
 
