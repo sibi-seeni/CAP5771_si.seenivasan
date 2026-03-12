@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from .database import SessionLocal, Video, Comment # Removed the . for local execution compatibility
 
 load_dotenv()
-API_KEY = os.getenv("YOUTUBE_API_KEY")
+API_KEY = os.getenv("YOUTUBE_API_KEY2")
 
 def get_youtube_client():
     return build("youtube", "v3", developerKey=API_KEY)
