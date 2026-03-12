@@ -21,7 +21,6 @@ WINDOW_DAYS = 90
 def get_youtube_client():
     return build("youtube", "v3", developerKey=API_KEY)
 
-
 def search_new_videos():
     youtube = get_youtube_client()
     db: Session = SessionLocal()
@@ -71,7 +70,8 @@ def search_new_videos():
             for item in response.get("items", []):
 
                 video_id = item["id"]["videoId"]
-
+                
+                # UPDATED LOGIC: Check both DB and the local session set
                 if video_id not in added_this_session:
 
                     exists = db.query(Video).filter_by(video_id=video_id).first()
@@ -97,8 +97,8 @@ def search_new_videos():
             if not next_page_token:
                 break
 
-        # Move cursor backwards for next run
-        state.last_search_time = published_after
+        # Commit after each keyword to clear the memory and save progress
+        state.last_search_time = datetime.utcnow()
         db.commit()
 
     db.close()
@@ -107,3 +107,4 @@ def search_new_videos():
 
 if __name__ == "__main__":
     search_new_videos()
+    
