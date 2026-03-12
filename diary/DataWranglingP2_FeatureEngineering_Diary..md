@@ -103,14 +103,19 @@ In the final dataset, I retained only analytically relevant columns:
 ```python
 columns_to_keep = [
     'comment_id', 'parent_id', 'parent_text',
-    'text', 'text_preprocessed',
-    'video_context', 'video_id',
-    'comment_date', 'author_hash',
-    'days_from_genai_announcement',
-    'days_from_business_model_change',
-    'days_from_game_launch',
+    'text_preprocessed',    
+    'video_context', 'video_id',               
+    'comment_date', 'author_hash',             
+    'days_from_genai_announcement', 
+    'days_from_business_model_change', 
+    'days_from_game_announcement',
+    'days_from_early_access',
+    'days_from_game_launch',              
     'mentions_genai', 'mentions_business_model',
-    'likes', 'like_count_log'
+    'mentions_launch', 'has_likes', 
+    'engagement_tier', 'comment_latency_days', 
+    'comment_latency_hours', 'latency_category',
+    'likes', 'like_count_log'] 
 ]
 ```
 
@@ -124,6 +129,12 @@ columns_to_keep = [
 * **Relevance**: Only features tied to sentiment, time, or engagement were retained.
 * **Redundancy**: Derived fields replaced raw equivalents.
 * **Ethics**: No personally identifiable information retained (only `author_hash`).
+
+---
+
+### Tokenization
+
+A surprising finding for me is that accessing the model using `tweetnlp` also loads the specific tokenizer for the same, so I need not perform a separate step during feature engineering to perform the appropriate tokenization. I will be using it for performing the sentiment classification task next.
 
 ---
 
