@@ -6,7 +6,7 @@ import time
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from sqlalchemy.orm import Session
-from .database import SessionLocal, Video, Comment # Removed the . for local execution compatibility
+from .database import SessionLocal, Video, Comment
 
 load_dotenv()
 API_KEY = os.getenv("YOUTUBE_API_KEY2")

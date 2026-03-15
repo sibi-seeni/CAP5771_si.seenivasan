@@ -21,6 +21,10 @@ WINDOW_DAYS = 90
 def get_youtube_client():
     return build("youtube", "v3", developerKey=API_KEY)
 
+def title_matches(title):
+    title_lower = title.lower()
+    return any(k.lower() in title_lower for k in KEYWORDS)
+
 def search_new_videos():
     youtube = get_youtube_client()
     db: Session = SessionLocal()
@@ -70,10 +74,70 @@ def search_new_videos():
             for item in response.get("items", []):
 
                 video_id = item["id"]["videoId"]
+                title = item["snippet"]["title"]
+
+                # ADD THIS FILTER HERE
+                if not title_matches(title):
+                    continue
                 
                 # UPDATED LOGIC: Check both DB and the local session set
                 if video_id not in added_this_session:
 
+                    exists = db.query(Video).filter_by(video_id=video_id).first()
+
+                    if not exists:
+                        new_video = Video(
+                            video_id=video_id,
+                            title=item["snippet"]["title"],
+                            description=item["snippet"]["description"],
+                            channel_id=item["snippet"]["channelId"],
+                            published_at=datetime.strptime(
+                                item["snippet"]["publishedAt"],
+                                '%Y-%m-%dT%H:%M:%SZ'
+                            ),
+                            keyword_matched=keyword
+                        )
+
+                        db.add(new_video)
+                        added_this_session.add(video_id)
+
+            next_page_token = response.get("nextPageToken")
+
+            if not next_page_token:
+                break
+
+        # -------- NEW: RECENT VIDEO DISCOVERY --------
+        recent_after = datetime(2025, 1, 1).strftime('%Y-%m-%dT%H:%M:%SZ')
+        recent_before = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        print(f"Searching RECENT data for '{keyword}' ({recent_after} to {recent_before})...")
+
+        next_page_token = None
+
+        while True:
+            request = youtube.search().list(
+                q=keyword,
+                part="snippet",
+                type="video",
+                order="date",  # date works better for recent discovery
+                publishedAfter=recent_after,
+                publishedBefore=recent_before,
+                videoCategoryId="20",
+                maxResults=50,
+                pageToken=next_page_token
+            )
+
+            response = request.execute()
+
+            for item in response.get("items", []):
+                video_id = item["id"]["videoId"]
+                title = item["snippet"]["title"]
+
+                # ADD HERE ALSO
+                if not title_matches(title):
+                    continue
+
+                if video_id not in added_this_session:
                     exists = db.query(Video).filter_by(video_id=video_id).first()
 
                     if not exists:
