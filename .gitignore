@@ -18,9 +18,12 @@ __pycache__/
 
 # Data exports
 data/
-collection_log.txt
 *.csv
 *.json
+
+# Logs
+collection_log.txt
+*.log
 
 # Code Editor files
 .vscode/
