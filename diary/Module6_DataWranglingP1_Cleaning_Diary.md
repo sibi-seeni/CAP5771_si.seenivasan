@@ -1,6 +1,6 @@
 # Data Cleaning Diary for Module 6
 
-### Overview
+## Overview
 
 In this phase, I focused on making the dataset analytically reliable before moving into modeling and sentiment analysis. The goal was to eliminate structural noise, standardize formats, and ensure that the remaining comments represent meaningful, high-quality input data.
 
@@ -13,7 +13,7 @@ In this phase, I focused on making the dataset analytically reliable before movi
 **Why this first?**
 Sentiment analysis depends entirely on textual input. Rows with missing or empty `text` or `video_description` fields are unusable for NLP tasks and would distort later statistics.
 
-### Rule Applied:
+### Rule Applied
 
 * **Drop** rows where:
 
@@ -57,7 +57,7 @@ This step reduced dataset size but still kept up the relevant entries.
 **Why?**
 Time-based features are central to my project (event reactions, sentiment decay, comment latency). Incorrect datetime types would break temporal calculations.
 
-### Rule Applied:
+### Applied
 
 * **Convert** string columns to datetime:
 
@@ -84,7 +84,7 @@ This enabled:
 **Why this early?**
 My sentiment model (RoBERTa) is English-based. Non-English text and very short comments (e.g., “lol”, “ok”) introduce noise and reduce signal clarity.
 
-### Rule Applied:
+### Rules Applied
 
 * **Filter**:
 
@@ -108,7 +108,7 @@ This step prioritizes consistency and keeps only meaningful content.
 **Why important?**
 Duplicate comments inflate frequency-based analysis and bias engagement statistics.
 
-### Rule Applied:
+### So, I Applied
 
 * **Deduplicate** identical comment texts
 
@@ -125,7 +125,7 @@ This reduces artificial amplification and improves fairness in engagement-weight
 **Why necessary?**
 Transformer models are sensitive to noise like URLs and user mentions.
 
-### Rule Applied:
+### I Applied
 
 * **Normalize**:
 
