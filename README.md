@@ -396,32 +396,28 @@ Main outputs produced:
 Planned extensions include:
 
 * Confidence-aware model training
-* DeBERTa fine-tuning experiments
+* RoBERTa and DeBERTa fine-tuning experiments
 * Temporal sentiment forecasting
-
----
-
-Here’s your updated **References** section with your new citations formatted consistently alongside the existing ones:
 
 ---
 
 ## References
 
-* **Loureiro, D., et al. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* (Base for the RoBERTa model used).
-
-* **Guo, C., et al. (2017).** *On Calibration of Modern Neural Networks.* ICML. (Validation for Confidence Scoring).
-
-* **Giachanou, A., & Crestani, F. (2016).** *Like It or Not: A Survey of Twitter Sentiment Analysis Methods.* ACM Computing Surveys. (Validation for Engagement Weighting).
-
-* **He, Y., He, Z., Gu, T., Gu, B., Wan, Y., & Li, M. (2025).** *Multi-Chain of Thought Prompt Learning for Aspect-Based Sentiment Analysis.* Applied Sciences, 15, 12225. [https://doi.org/10.3390/app152212225](https://doi.org/10.3390/app152212225)
+* **Singh, R. K., & Thomas, A. (2025).** *A Systematic Literature Review of YouTube Comments Sentiment Analysis: Challenges and Emerging Trends.* ICTACT Journal on Data Science and Machine Learning, 7(1). [https://doi.org/10.21917/ijdsml.2025.0184](https://doi.org/10.21917/ijdsml.2025.0184)
 
 * **Tohidi, K., Dashtipour, K., Rebora, S., & Pourfaramarz, S. (2025).** *A Comparative Evaluation of Large Language Models for Persian Sentiment Analysis and Emotion Detection in Social Media Texts.* arXiv preprint arXiv:2509.14922. [https://arxiv.org/abs/2509.14922](https://arxiv.org/abs/2509.14922)
 
-* **Singh, R. K., & Thomas, A. (2025).** *A Systematic Literature Review of YouTube Comments Sentiment Analysis: Challenges and Emerging Trends.* ICTACT Journal on Data Science and Machine Learning, 7(1). [https://doi.org/10.21917/ijdsml.2025.0184](https://doi.org/10.21917/ijdsml.2025.0184)
+* **He, Y., He, Z., Gu, T., Gu, B., Wan, Y., & Li, M. (2025).** *Multi-Chain of Thought Prompt Learning for Aspect-Based Sentiment Analysis.* Applied Sciences, 15, 12225. [https://doi.org/10.3390/app152212225](https://doi.org/10.3390/app152212225)
+
+* **Schmitt, M., Schwerk, A., & Lempert, S. (2026).** *Enhancing Sentiment Classification and Irony Detection in Large Language Models through Advanced Prompt Engineering Techniques.* arXiv preprint arXiv:2601.08302. [https://arxiv.org/abs/2601.08302](https://arxiv.org/abs/2601.08302)
 
 * **Silveira, P. S. P., & Siqueira, J. O. (2023).** *Better to Be in Agreement Than in Bad Company: A Critical Analysis of Many Kappa-Like Tests.* Behavior Research Methods, 55, 3326–3347. [https://doi.org/10.3758/s13428-022-01950-0](https://doi.org/10.3758/s13428-022-01950-0)
 
-* **Schmitt, M., Schwerk, A., & Lempert, S. (2026).** *Enhancing Sentiment Classification and Irony Detection in Large Language Models through Advanced Prompt Engineering Techniques.* arXiv preprint arXiv:2601.08302. [https://arxiv.org/abs/2601.08302](https://arxiv.org/abs/2601.08302)
+* **Loureiro, D., Barbieri, F., Neves, L., Espinosa Anke, L., & Camacho-Collados, J. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* arXiv preprint arXiv:2202.03829. [https://arxiv.org/abs/2202.03829](https://arxiv.org/abs/2202.03829)
+
+* **Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017).** *On Calibration of Modern Neural Networks.* arXiv preprint arXiv:1706.04599. [https://arxiv.org/abs/1706.04599](https://arxiv.org/abs/1706.04599)
+
+* **Giachanou, A., & Crestani, F. (2016).** *Like It or Not: A Survey of Twitter Sentiment Analysis Methods.* ACM Computing Surveys, 49(2), Article 28, 41 pages. [https://doi.org/10.1145/2938640](https://doi.org/10.1145/2938640)
 
 ---
 
