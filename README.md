@@ -1,204 +1,427 @@
-# Arc Raiders Sentiment Analysis Pipeline
+# Arc Raiders YouTube Sentiment Analysis
 
-### Project for CAP5771: Introduction to Data Science
+### Event-Driven Sentiment Analysis using Hybrid AI Labeling
 
-## Project Overview
-
-My project implements an end-to-end data engineering and NLP pipeline to track community sentiment for the video game **Arc Raiders** (developed by Embark Studios). By utilizing the YouTube Data API v3 and with the help of a State-of-the-Art (SOTA) Transformer model down the line, I analyze how sentiment shifts in response to game updates, roadmaps (e.g., the 2026 Roadmap), and seasonal events.
-
-The study period covers the game's launch (October 30, 2025) through the present, providing a longitudinal view of community reception.
+Project for CAP5771 – Introduction to Data Science
 
 ---
 
-## Table of Contents
+## Project Overview
 
-* [Project Overview](#project-overview)
-* [Repository Structure](#repository-structure)
-* [Methodology & Progress](#methodology--progress)
+This project implements an end-to-end **data engineering, NLP, and hybrid AI labeling pipeline** to analyze community sentiment toward *Arc Raiders* using YouTube comments. The goal is not just sentiment classification, but understanding **how sentiment changes around major game announcements and AI-related controversies**.
 
-  * [Data Source: The YouTube Data API v3 (Phase 1)](#data-source-the-youtube-data-api-v3-phase-1)
-  * [Data Engineering (Phases 2-3)](#data-engineering-phases-2-3)
+The pipeline combines:
 
-    * [ER Diagram](#er-diagram)
-  * [Data Exploration (Phase 4)](#data-exploration-phase-4)
-  * [Future Steps: Natural Language Processing](#future-steps-natural-language-processing)
-* [How to Run the Program](#how-to-run-the-program)
+* Automated YouTube data collection
+* Structured data wrangling and feature engineering
+* Hybrid LLM + transformer labeling workflow
+* Confidence-aware sentiment filtering
+* Event-driven temporal sentiment analysis
 
-  * [1. Prerequisites](#1-prerequisites)
-  * [2. Setup](#2-setup)
-  * [3. Execution](#3-execution)
-  * [4. Alternative](#4-alternative)
-* [Expected Outputs](#expected-outputs)
-* [References](#references)
+The study spans major events from the game's reveal through launch and post-release updates, enabling longitudinal sentiment tracking. 
 
 ---
 
 ## Repository Structure
 
 ```text
-CAP5771_si.seenivasan/
-├── diary/                   # Diary entries for CAP5771
-├── src/                     # Source Code for Data Acquisition
-│   ├── __init__.py          # Package initialization
-│   ├── database.py          # Phase 3: SQLAlchemy models & SQLite schema
-│   ├── discovery.py         # Phase 2: Automated video discovery
-│   └── collector.py         # Phase 2: Comment scraping
-├── .env                     # (Git-ignored) YOUTUBE_API_KEY
-├── .gitignore               # Ensures sensitive/large data is not pushed to GitHub
-├── collection_log.txt       # (Git-ignored) Pipeline execution logs
-├── arc-raiders-sentiment.db # (Git-ignored) SQLite3 Database to store all collected data
-├── main.py                  # Pipeline orchestrator (Entry Point)
-├── EDA.ipynb                # Jupyter Notebook that contains the data exploration
-├── requirements.txt         # Project dependencies
-└── README.md                # Project documentation
-
+CAP5771_SI.SEENIVASAN/
+│
+├── data/                            # Processed datasets
+│   ├── comments_data.csv            # Raw dataset used for EDA
+│   ├── comments_for_analysis.csv    # Cleaned dataset after wrangling
+│   ├── comments_labeled.csv         # Final labeled dataset
+│   ├── comments_llama_labeled.csv        
+│   ├── comments_llama_labeled.jsonl # LLM labeling outputs
+│   └── roberta_classifications.csv  # Baseline transformer predictions
+│
+├── preprocessing/                   # Data preparation notebooks
+│   ├── Data_Wrangling.ipynb
+│   ├── EDA.ipynb
+│   ├── Llama_Labeler.ipynb
+│   ├── Manual_Labeling_Analysis.ipynb
+│   ├── roberta_classification.py
+│   └── absa_labeler.log
+│
+├── figures/                         # EDA visualizations
+│   ├── 01_text_characteristic.png
+│   ├── 02_language_distribution.png
+│   ├── 03_temporal_patterns.png
+│   └── 04_video_analysis.png
+│
+├── src/                             # Data collection pipeline
+│   ├── database.py
+│   ├── discovery.py
+│   └── collector.py
+│
+├── diary/                           # Coursework reflections
+│
+├── arc_raiders_sentiment.db         # SQLite database
+├── main.py                          # Pipeline entrypoint
+├── collection_log.txt               # Collection logs
+├── comments.txt                     # Raw export
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## Methodology & Progress
+## Methodology
 
-### Data Source: The YouTube Data API v3 (Phase 1)
+### 1 Data Collection Pipeline
 
-The primary data for this study was retrieved using the YouTube Data API v3, a RESTful interface provided by Google that allows for the systematic collection of video metadata and user-generated comments. For this project, the API was leveraged to perform **keyword-based discovery** of Arc Raiders content and to conduct deep-crawl extractions of **associated comment threads** for sentiment analysis.
+Data was collected using the YouTube Data API v3 through a custom pipeline that performs:
 
-In the current landscape of computational social science, the YouTube Data API represents a critical resource, as it remains one of the last prominent, high-fidelity social media APIs accessible to researchers without the prohibitive costs or restrictive access tiers recently implemented by platforms such as X (formerly Twitter) and Reddit.
+**Video discovery**
 
-### Data Engineering (Phases 2-3)
+* Keyword-driven search
+* Incremental discovery logic
+* API quota optimization
 
-* **Incremental Discovery:** Implemented a state-aware search logic that tracks `last_search_time` to avoid redundant API calls and manage daily quotas.
-* **Data Privacy (Ethics):** As I am planning to work towards an article, all user identifiers are anonymized using **SHA-256 hashing** (`author_hash`) before storage to ensure data minimization.
-* **Database Infrastructure:** Built a relational SQLite schema using SQLAlchemy to handle video-comment relationships and maintain search state. Implemented 2-layer deduplication (Memory Set + DB Unique Constraints).
+**Comment collection**
 
-#### ER Diagram
+* Thread expansion
+* Reply collection
+* Metadata extraction
 
-```mermaid
-%%{init: {
-  "themeVariables": {
-    "fontSize": "9px"
-  }
-}}%%
-erDiagram
-    VIDEOS {
-        string video_id PK
-        string title
-        text description
-        string channel_id
-        datetime published_at
-        string keyword_matched
-        datetime first_seen_at
-        boolean comments_disabled
-    }
+**Database storage**
 
-    COMMENTS {
-        string comment_id PK
-        string video_id FK
-        string parent_id
-        string author_hash
-        text text
-        int like_count
-        datetime published_at
-        datetime last_updated_at
-    }
+* SQLite relational schema
+* Deduplication safeguards
+* Collection state tracking
 
-    COLLECTION_STATE {
-        string keyword PK
-        datetime last_search_time
-    }
+All user identifiers are anonymized using SHA-256 hashing to ensure ethical data usage.
 
-    VIDEOS ||--o{ COMMENTS : has
+### 2 Exploratory Data Analysis
+
+EDA was performed to understand dataset characteristics before modeling:
+
+**Text analysis**
+
+* Comment length distribution
+* Word frequency analysis
+* Multilingual distribution
+* Token limits for transformer models
+
+**Temporal analysis**
+
+* Comment spikes around announcements
+* Engagement concentration patterns
+* Heavy-tail interaction distribution
+
+**Content analysis**
+
+* Domain keyword frequency
+* AI discussion detection
+* Feature discussion trends
+
+Results confirmed suitability for event-driven sentiment modeling. 
+
+### 3 Data Wrangling Pipeline
+
+The Data_Wrangling notebook implements the structured preprocessing workflow used to prepare the modeling dataset.
+
+#### Data cleaning
+
+* Removed missing comments
+* Filtered empty text fields
+* Standardized datetime columns
+* Sorted for time-series analysis
+
+#### Feature engineering
+
+##### **Event features**
+
+Binary indicators detecting discussion of:
+
+* Game announcements
+* Generative AI usage
+* Business model changes
+* Launch events
+
+Temporal features include:
+
+* Days from major announcements
+* Comment timing relative to events
+* Sentiment decay preparation variables
+
+#### Engagement features
+
+Engineered variables including:
+
+* Log-transformed like counts
+* Engagement tiers
+* Comment latency after upload
+* Interaction timing categories
+
+#### Text preprocessing
+
+Text prepared for NLP models:
+
+* URL normalization
+* Mention removal
+* Whitespace normalization
+* Token-safe formatting
+
+#### Conversational context enrichment
+
+Added contextual features:
+
+* Video description context
+* Parent comment text for replies
+* Conversation structure information
+
+This enables future conversational NLP experiments.
+
+#### Dataset quality filtering
+
+High quality subset created using:
+
+* English language filtering
+* Minimum word thresholds
+* Duplicate removal
+* Missing value removal
+
+Final modeling dataset exported as:
+
+```
+data/comments_for_analysis.csv
 ```
 
-### Data Exploration (Phase 4)
+### 4 Hybrid Sentiment Labeling Workflow
 
-* **Loading the database:** SQL Joins were performed on the stored data to load into pandas DataFrames. 
-* **Text-based analysis:** Examines comment length distributions, word frequency trends, multilingual presence, and sentiment-indicating vocabulary. Special consideration is given to transformer-based NLP constraints, such as the 512-token input limit for RoBERTa, ensuring that the dataset is suitable for downstream modeling. Domain-specific keyword detection provides insight into community discourse and feature-driven discussions.
-* **Time-based analysis:** It revealed some useful insights, like that engagement is highly concentrated, and approximately 14% of total comment volume occurs during statistically significant spike days, largely driven by a small number of high-performing videos. This indicates a heavy-tailed engagement distribution, where a minority of videos account for a disproportionate share of interaction.
+A hybrid labeling approach was implemented to improve reliability beyond single-model classification.
 
-Overall, the dataset demonstrates strong potential for sentiment modeling, engagement prediction, and event-driven trend analysis.
+#### Stage 1 – Baseline transformer labeling
 
-### Future Steps: Natural Language Processing
+RoBERTa sentiment model used as baseline:
 
-* **Model Selection:** Utilized `cardiffnlp/twitter-roberta-base-sentiment-latest`, a RoBERTa-base model fine-tuned on 124M tweets, providing superior nuance over lexicon-based methods like VADER.
-* **Confidence Filtering:** Implementing a "Reject Option" based on **Softmax Probability** (Hendrycks & Gimpel, 2016). Only predictions with confidence > 0.70 are utilized for trend analysis to reduce noise.
-* **Interaction Weighting:** To account for community consensus, a **Popularity-Weighted Sentiment** feature will be engineered:
-$$\text{Weighted Score} = \text{Sentiment Label} \times \log(1 + \text{Like Count})$$. This prevents viral outliers from skewing trends while ensuring highly-voted community feedback is prioritized (Giachanou & Crestani, 2016).
+Model:
 
----
+```
+cardiffnlp/twitter-roberta-base-sentiment-latest
+```
 
-## How to Run the Program
+Purpose:
 
-### 1. Prerequisites
+* Benchmark performance
+* Compare with LLM labeling
+* Identify difficult samples
 
-* Python 3.10+
-* A Google Cloud Project with the **[YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started)** enabled.
-* An API Key.
+Output:
 
-### 2. Setup
+```
+roberta_classifications.csv
+```
 
-1. **Clone the repository:**
+#### Stage 2 – Silver dataset (LLM labeling)
+
+A large language model was used to generate higher quality labels:
+
+Model:
+
+Llama-3.3-70B (UF HiPerGator NaviGator)
+
+Advantages:
+
+* Better sarcasm detection
+* Context awareness
+* Multi-topic understanding
+* Gaming domain reasoning
+
+Output:
+
+```
+comments_llama_labeled.jsonl
+comments_llama_labeled.csv
+```
+
+#### Stage 3 – Gold dataset (manual validation)
+
+Manual annotation performed on a subset to:
+
+* Validate LLM reliability
+* Measure agreement
+* Identify failure modes
+* Improve prompt design
+
+This subset was generated and analysed after labeling in `Manual_Labeling_Analysis.ipynb`
+This creates a gold evaluation dataset.
+
+#### Stage 4 – Final labeled dataset
+
+Combined outputs merged into:
+
+```
+comments_labeled.csv
+```
+
+This dataset enables:
+
+* Model comparison
+* Confidence analysis
+* Error analysis
+* Research experiments
+
+### 5 Confidence-Aware Sentiment Analysis
+
+The project explores **confidence-aware labeling**, where uncertain predictions can be flagged or filtered.
+
+Implemented ideas include:
+
+* Confidence threshold filtering
+* Reject option classification
+* Reliability comparison between models
+* Confidence distribution analysis
+
+This supports research into hybrid AI supervision workflows.
+
+### 6 Research Contributions
+
+This project contributes:
+
+* Event-driven sentiment analysis pipeline for gaming communities
+* Hybrid LLM + transformer labeling workflow
+* Confidence-aware sentiment filtering approach
+* Temporal sentiment spike analysis framework
+* Dataset for studying AI controversy reactions in games
+
+### How to Run the Project
+
+### 1 Setup
+
+Clone repository:
+
 ```bash
 git clone https://github.com/sibi-seeni/CAP5771_si.seenivasan.git
 cd CAP5771_si.seenivasan
-````
+```
 
-2. **Create a virtual environment with uv:**
+Create environment:
 
 ```bash
 uv venv .venv
+source .venv/bin/activate
 ```
 
-3. **Activate the virtual environment:**
-
-* macOS / Linux: `source .venv/bin/activate`
-
-* Windows (PowerShell): `.venv\Scripts\Activate.ps1`
-
-4. **Install dependencies using uv:**
+Install dependencies:
 
 ```bash
 uv pip install -r requirements.txt
 ```
 
-5. **Configure Environment:**
-   Create a `.env` file in the root directory and add your key:
+Configure API key:
 
-```text
-YOUTUBE_API_KEY=your_actual_key_here
+```
+YOUTUBE_API_KEY=your_key
+NAVIGATOR_API_KEYS=your_key,your_key
 ```
 
+### 2 Running the data collection pipeline
 
-### 3. Execution
-
-To run the full pipeline (Discovery -> Collection -> Storing), execute the main orchestrator:
+- **Run data collection**:
 
 ```bash
-python3 main.py
-
+python main.py full
 ```
 
-Next, for performing exploratory data analysis, run the Jupyter Notebook `EDA.ipynb` in the main directory.
+  - Alternative:
 
+  If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from [HuggingFace](https://huggingface.co/datasets/persona-156/arc-raiders-sentiment/tree/main): `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory after cloning (In Step 2).
 
-### 4. Alternative:
+- **Run EDA**:
 
-If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from [HuggingFace](https://huggingface.co/datasets/persona-156/arc-raiders-sentiment/tree/main): `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory after cloning (In Step 2).
+```
+preprocessing/EDA.ipynb
+```
+
+- **Run wrangling**:
+
+```
+preprocessing/Data_Wrangling.ipynb
+```
+
+- **Run RoBERTa baseline**:
+
+```bash
+python preprocessing/roberta_classification.py
+```
+
+- **Run labeling**:
+
+```
+preprocessing/Llama_Labeler.ipynb
+```
+
+- **Creating and comparing 'Gold labels'**
+
+```
+preprocessing/Manual_Labeling_Analysis.ipynb
+```
+
+### Expected Outputs
+
+Main outputs produced:
+
+**Datasets**
+
+* comments_data.csv
+* comments_for_analysis.csv
+* comments_llama_labeled.csv
+* comments_llama_labeled.jsonl
+* roberta_classifications.csv
+* comments_labeled.csv
+
+**Database**
+
+* arc_raiders_sentiment.db
+
+**Figures**
+
+* Text analysis plots
+* Language distribution
+* Temporal analysis charts
+* Video engagement analysis
+
+**Logs**
+
+* collection_log.txt
+* absa_labeler.log
 
 ---
 
-## Expected Outputs
+# Future Work
 
-* **`arc_raiders_sentiment.db`**: A local database containing thousands of categorized comments.
-* **`collection_log.txt`**: A detailed log of API quota usage and video discovery counts.
-* **`comments_data.csv`**: The dataframe on which EDA was performed, exported into a CSV for reference.
+Planned extensions include:
+
+* Confidence-aware model training
+* DeBERTa fine-tuning experiments
+* Temporal sentiment forecasting
+
+---
+
+Here’s your updated **References** section with your new citations formatted consistently alongside the existing ones:
 
 ---
 
 ## References
 
 * **Loureiro, D., et al. (2022).** *TimeLMs: Diachronic Language Models from Twitter.* (Base for the RoBERTa model used).
+
 * **Guo, C., et al. (2017).** *On Calibration of Modern Neural Networks.* ICML. (Validation for Confidence Scoring).
+
 * **Giachanou, A., & Crestani, F. (2016).** *Like It or Not: A Survey of Twitter Sentiment Analysis Methods.* ACM Computing Surveys. (Validation for Engagement Weighting).
+
+* **He, Y., He, Z., Gu, T., Gu, B., Wan, Y., & Li, M. (2025).** *Multi-Chain of Thought Prompt Learning for Aspect-Based Sentiment Analysis.* Applied Sciences, 15, 12225. [https://doi.org/10.3390/app152212225](https://doi.org/10.3390/app152212225)
+
+* **Tohidi, K., Dashtipour, K., Rebora, S., & Pourfaramarz, S. (2025).** *A Comparative Evaluation of Large Language Models for Persian Sentiment Analysis and Emotion Detection in Social Media Texts.* arXiv preprint arXiv:2509.14922. [https://arxiv.org/abs/2509.14922](https://arxiv.org/abs/2509.14922)
+
+* **Singh, R. K., & Thomas, A. (2025).** *A Systematic Literature Review of YouTube Comments Sentiment Analysis: Challenges and Emerging Trends.* ICTACT Journal on Data Science and Machine Learning, 7(1). [https://doi.org/10.21917/ijdsml.2025.0184](https://doi.org/10.21917/ijdsml.2025.0184)
+
+* **Silveira, P. S. P., & Siqueira, J. O. (2023).** *Better to Be in Agreement Than in Bad Company: A Critical Analysis of Many Kappa-Like Tests.* Behavior Research Methods, 55, 3326–3347. [https://doi.org/10.3758/s13428-022-01950-0](https://doi.org/10.3758/s13428-022-01950-0)
+
+* **Schmitt, M., Schwerk, A., & Lempert, S. (2026).** *Enhancing Sentiment Classification and Irony Detection in Large Language Models through Advanced Prompt Engineering Techniques.* arXiv preprint arXiv:2601.08302. [https://arxiv.org/abs/2601.08302](https://arxiv.org/abs/2601.08302)
 
 ---
 
