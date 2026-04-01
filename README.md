@@ -69,7 +69,7 @@ CAP5771_SI.SEENIVASAN/
 
 ## Methodology
 
-### 1 Data Collection Pipeline
+### 1. Data Collection Pipeline
 
 Data was collected using the YouTube Data API v3 through a custom pipeline that performs:
 
@@ -93,7 +93,7 @@ Data was collected using the YouTube Data API v3 through a custom pipeline that 
 
 All user identifiers are anonymized using SHA-256 hashing to ensure ethical data usage.
 
-### 2 Exploratory Data Analysis
+### 2. Exploratory Data Analysis
 
 EDA was performed to understand dataset characteristics before modeling:
 
@@ -118,9 +118,9 @@ EDA was performed to understand dataset characteristics before modeling:
 
 Results confirmed suitability for event-driven sentiment modeling. 
 
-### 3 Data Wrangling Pipeline
+### 3. Data Wrangling
 
-The Data_Wrangling notebook implements the structured preprocessing workflow used to prepare the modeling dataset.
+The Data_Wrangling.ipynb notebook implements the structured preprocessing workflow used to prepare the modeling dataset.
 
 #### Data cleaning
 
@@ -189,7 +189,7 @@ Final modeling dataset exported as:
 data/comments_for_analysis.csv
 ```
 
-### 4 Hybrid Sentiment Labeling Workflow
+### 4. Hybrid Sentiment Labeling Workflow
 
 A hybrid labeling approach was implemented to improve reliability beyond single-model classification.
 
@@ -264,7 +264,7 @@ This dataset enables:
 * Error analysis
 * Research experiments
 
-### 5 Confidence-Aware Sentiment Analysis
+### 5. Confidence-Aware Sentiment Analysis
 
 The project explores **confidence-aware labeling**, where uncertain predictions can be flagged or filtered.
 
@@ -277,7 +277,7 @@ Implemented ideas include:
 
 This supports research into hybrid AI supervision workflows.
 
-### 6 Research Contributions
+### 6. Research Contributions
 
 This project contributes:
 
@@ -287,9 +287,9 @@ This project contributes:
 * Temporal sentiment spike analysis framework
 * Dataset for studying AI controversy reactions in games
 
-### How to Run the Project
+## How to Run the Project
 
-### 1 Setup
+### 1. Setup
 
 Clone repository:
 
@@ -318,7 +318,7 @@ YOUTUBE_API_KEY=your_key
 NAVIGATOR_API_KEYS=your_key,your_key
 ```
 
-### 2 Running the data collection pipeline
+### 2. Running the data collection pipeline
 
 - **Run data collection**:
 
@@ -391,7 +391,7 @@ Main outputs produced:
 
 ---
 
-# Future Work
+## Future Work
 
 Planned extensions include:
 
