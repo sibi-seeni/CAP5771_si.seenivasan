@@ -44,10 +44,6 @@ CAP5771_SI.SEENIVASAN/
 │   └── absa_labeler.log
 │
 ├── figures/                         # EDA visualizations
-│   ├── 01_text_characteristic.png
-│   ├── 02_language_distribution.png
-│   ├── 03_temporal_patterns.png
-│   └── 04_video_analysis.png
 │
 ├── src/                             # Data collection pipeline
 │   ├── database.py
@@ -56,6 +52,7 @@ CAP5771_SI.SEENIVASAN/
 │
 ├── diary/                           # Coursework reflections
 │
+├── ECJ_Analysis.ipynb               # Analysis notebook for paper
 ├── arc_raiders_sentiment.db         # SQLite database
 ├── main.py                          # Pipeline entrypoint
 ├── collection_log.txt               # Collection logs
@@ -67,337 +64,303 @@ CAP5771_SI.SEENIVASAN/
 
 ---
 
+---
+
 ## Methodology
 
 ### 1. Data Collection Pipeline
 
-Data was collected using the YouTube Data API v3 through a custom pipeline that performs:
+Data was collected using the YouTube Data API v3 through a custom pipeline:
 
-**Video discovery**
+* Video discovery via keyword search
+* Full comment thread extraction (including replies)
+* Metadata collection (timestamps, likes, etc.)
+* Storage in a SQLite database with deduplication
 
-* Keyword-driven search
-* Incremental discovery logic
-* API quota optimization
+All user identifiers are anonymized via SHA-256 hashing.
 
-**Comment collection**
+---
 
-* Thread expansion
-* Reply collection
-* Metadata extraction
+### 2. Data Wrangling & Feature Engineering
 
-**Database storage**
+Implemented in `Data_Wrangling.ipynb`.
 
-* SQLite relational schema
-* Deduplication safeguards
-* Collection state tracking
+#### Data Cleaning
 
-All user identifiers are anonymized using SHA-256 hashing to ensure ethical data usage.
+* Removed duplicates and missing entries
+* Filtered non-English comments
+* Standardized timestamps for time-series analysis
 
-### 2. Exploratory Data Analysis
+#### Feature Engineering
 
-EDA was performed to understand dataset characteristics before modeling:
+**Event Features**
 
-**Text analysis**
+* Binary indicators for:
 
-* Comment length distribution
-* Word frequency analysis
-* Multilingual distribution
-* Token limits for transformer models
+  * Game announcements
+  * AI-related discussions
+  * Monetization changes
+  * Release events
 
-**Temporal analysis**
+**Temporal Features**
 
-* Comment spikes around announcements
-* Engagement concentration patterns
-* Heavy-tail interaction distribution
+* Days relative to event
+* Pre/post-event window indicators
 
-**Content analysis**
+**Engagement Features**
 
-* Domain keyword frequency
-* AI discussion detection
-* Feature discussion trends
-
-Results confirmed suitability for event-driven sentiment modeling. 
-
-### 3. Data Wrangling
-
-The Data_Wrangling.ipynb notebook implements the structured preprocessing workflow used to prepare the modeling dataset.
-
-#### Data cleaning
-
-* Removed missing comments
-* Filtered empty text fields
-* Standardized datetime columns
-* Sorted for time-series analysis
-
-#### Feature engineering
-
-##### **Event features**
-
-Binary indicators detecting discussion of:
-
-* Game announcements
-* Generative AI usage
-* Business model changes
-* Launch events
-
-Temporal features include:
-
-* Days from major announcements
-* Comment timing relative to events
-* Sentiment decay preparation variables
-
-#### Engagement features
-
-Engineered variables including:
-
-* Log-transformed like counts
+* `like_count_log = log(1 + likes)`
 * Engagement tiers
-* Comment latency after upload
-* Interaction timing categories
+* Comment timing after video upload
 
-#### Text preprocessing
-
-Text prepared for NLP models:
+**Text Processing**
 
 * URL normalization
-* Mention removal
-* Whitespace normalization
+* Noise removal
 * Token-safe formatting
 
-#### Conversational context enrichment
+---
 
-Added contextual features:
+### 3. LLM-Based Aspect-Based Sentiment Analysis (ABSA)
 
-* Video description context
-* Parent comment text for replies
-* Conversation structure information
+#### Model
 
-This enables future conversational NLP experiments.
+* Llama 3.3 70B (UF HiPerGator NaviGator)
 
-#### Dataset quality filtering
+#### Task
 
-High quality subset created using:
+Each comment is labeled for:
 
-* English language filtering
-* Minimum word thresholds
-* Duplicate removal
-* Missing value removal
+* Sentiment: Positive / Neutral / Negative
+* Aspect:
 
-Final modeling dataset exported as:
+  * Game-related
+  * AI-related
 
-```
-data/comments_for_analysis.csv
-```
+#### Why ABSA?
 
-### 4. Hybrid Sentiment Labeling Workflow
+Traditional sentiment classification fails to separate:
 
-A hybrid labeling approach was implemented to improve reliability beyond single-model classification.
+> "The game looks great but the AI voices are terrible"
 
-#### Stage 1 – Baseline transformer labeling
+ABSA allows isolating **controversy-specific sentiment**, which is critical for analysis.
 
-RoBERTa sentiment model used as baseline:
+---
 
-Model:
+### 4. Validation of LLM Labels
 
-```
-cardiffnlp/twitter-roberta-base-sentiment-latest
-```
+A manually annotated **Gold Dataset (n ≈ 1000)** was created.
 
-Purpose:
+#### Metric
 
-* Benchmark performance
-* Compare with LLM labeling
-* Identify difficult samples
+* **Gwet’s AC1** (robust to class imbalance)
 
-Output:
+#### Result
 
-```
-roberta_classifications.csv
-```
+* AC1 ≈ 0.98 → near-perfect agreement
 
-#### Stage 2 – Silver dataset (LLM labeling)
+#### Conclusion
 
-A large language model was used to generate higher quality labels:
+LLM labels are treated as **reliable ground truth** for downstream analysis.
 
-Model:
+---
 
-Llama-3.3-70B (UF HiPerGator NaviGator)
+### 5. Event Detection Framework
 
-Advantages:
+* Daily comment volume aggregation
+* Spike detection using statistical thresholds
+* Manual verification using:
 
-* Better sarcasm detection
-* Context awareness
-* Multi-topic understanding
-* Gaming domain reasoning
+  * Video uploads
+  * Keywords
+* Event categorization:
 
-Output:
+  * Announcements
+  * AI controversies
+  * Monetization changes
+  * Releases/updates
 
-```
-comments_llama_labeled.jsonl
-comments_llama_labeled.csv
-```
+---
 
-#### Stage 3 – Gold dataset (manual validation)
+### 6. Sentiment Half-Life Modeling (Core Contribution)
 
-Manual annotation performed on a subset to:
-
-* Validate LLM reliability
-* Measure agreement
-* Identify failure modes
-* Improve prompt design
-
-This subset was generated and analysed after labeling in `Manual_Labeling_Analysis.ipynb`
-This creates a gold evaluation dataset.
-
-#### Stage 4 – Final labeled dataset
-
-Combined outputs merged into:
+We model how sentiment evolves after an event using exponential decay:
 
 ```
-comments_labeled.csv
+S(t) = S₀ e^(−λt)
 ```
 
-This dataset enables:
+Half-life:
 
-* Model comparison
-* Confidence analysis
-* Error analysis
-* Research experiments
+```
+t½ = ln(2) / λ
+```
 
-### 5. Confidence-Aware Sentiment Analysis
+#### Interpretation
 
-The project explores **confidence-aware labeling**, where uncertain predictions can be flagged or filtered.
+* **Short half-life** → temporary backlash (low risk)
+* **Long half-life** → sustained dissatisfaction (high risk)
 
-Implemented ideas include:
+---
 
-* Confidence threshold filtering
-* Reject option classification
-* Reliability comparison between models
-* Confidence distribution analysis
+### 7. Engagement-Weighted Sentiment (Silent Majority)
 
-This supports research into hybrid AI supervision workflows.
+Raw sentiment is adjusted using:
 
-### 6. Research Contributions
+```
+like_count_log = log(1 + likes)
+```
 
-This project contributes:
+#### Purpose
 
-* Event-driven sentiment analysis pipeline for gaming communities
-* Hybrid LLM + transformer labeling workflow
-* Confidence-aware sentiment filtering approach
-* Temporal sentiment spike analysis framework
-* Dataset for studying AI controversy reactions in games
+* Captures **community agreement**, not just comment volume
+* Identifies whether negative sentiment is:
+
+  * Vocal minority OR
+  * Widely endorsed opinion
+
+---
+
+### 8. Temporal Sentiment Analysis
+
+Event windows:
+
+* Pre-event (−7 days)
+* Event window (±2 days)
+* Post-event (+7 days)
+
+Analyzed metrics:
+
+* Sentiment ratios
+* Polarization trends
+* Recovery trajectories
+
+---
+
+## Key Insights
+
+This framework enables:
+
+* Detection of **event-driven sentiment spikes**
+* Measurement of **outrage persistence**
+* Identification of **true community consensus**
+
+Example insight:
+
+* AI-related controversies show:
+
+  * Stronger negative sentiment
+  * Longer recovery times
+  * Higher engagement-weighted agreement
+
+---
 
 ## How to Run the Project
 
 ### 1. Setup
 
-Clone repository:
-
 ```bash
 git clone https://github.com/sibi-seeni/CAP5771_si.seenivasan.git
 cd CAP5771_si.seenivasan
-```
 
-Create environment:
-
-```bash
 uv venv .venv
 source .venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
 uv pip install -r requirements.txt
 ```
 
-Configure API key:
+Set environment variables:
 
 ```
 YOUTUBE_API_KEY=your_key
-NAVIGATOR_API_KEYS=your_key,your_key
+NAVIGATOR_API_KEYS=your_key
 ```
 
-### 2. Running the data collection pipeline
+---
 
-- **Run data collection**:
+### 2. Pipeline Execution
+
+#### Data Collection
 
 ```bash
 python main.py full
 ```
 
-  - Alternative:
+(Optional: download DB from HuggingFace and skip collection)
 
-  If you want to skip the data collection pipeline, and directly start from data exploration, the database can be downloaded directly from [HuggingFace](https://huggingface.co/datasets/persona-156/arc-raiders-sentiment/tree/main): `persona-156/arc-raiders-sentiment/arc_raiders_sentiment.db`, and storing it in the root directory after cloning (In Step 2).
-
-- **Run EDA**:
+#### EDA
 
 ```
 preprocessing/EDA.ipynb
 ```
 
-- **Run wrangling**:
+#### Data Wrangling
 
 ```
 preprocessing/Data_Wrangling.ipynb
 ```
 
-- **Run RoBERTa baseline**:
-
-```bash
-python preprocessing/roberta_classification.py
-```
-
-- **Run labeling**:
+#### LLM Labeling
 
 ```
 preprocessing/Llama_Labeler.ipynb
 ```
 
-- **Creating and comparing 'Gold labels'**
+#### Gold Dataset Validation
 
 ```
 preprocessing/Manual_Labeling_Analysis.ipynb
 ```
 
-### Expected Outputs
+#### Final Analysis (Paper)
 
-Main outputs produced:
+```
+ECJ_Analysis.ipynb
+```
 
-**Datasets**
+---
 
-* comments_data.csv
-* comments_for_analysis.csv
-* comments_llama_labeled.csv
-* comments_llama_labeled.jsonl
-* roberta_classifications.csv
-* comments_labeled.csv
+## Outputs
 
-**Database**
+### Datasets
 
-* arc_raiders_sentiment.db
+* `comments_for_analysis.csv`
+* `comments_llama_labeled.csv`
+* `comments_labeled.csv`
 
-**Figures**
+### Database
 
-* Text analysis plots
-* Language distribution
-* Temporal analysis charts
-* Video engagement analysis
+* `arc_raiders_sentiment.db`
 
-**Logs**
+### Figures
 
-* collection_log.txt
-* absa_labeler.log
+* Temporal sentiment plots
+* Event spike visualizations
+* Decay curves
+* Engagement-weighted sentiment charts
+
+### Logs
+
+* `collection_log.txt`
+* `absa_labeler.log`
+
+---
+
+## Research Contributions
+
+* Event-driven sentiment analysis for gaming communities
+* LLM-based ABSA pipeline validated with AC1
+* Sentiment half-life modeling (novel contribution)
+* Engagement-weighted consensus detection
+* Empirical analysis of AI-related gaming controversies
 
 ---
 
 ## Future Work
 
-Planned extensions include:
-
-* Confidence-aware model training
-* RoBERTa and DeBERTa fine-tuning experiments
-* Temporal sentiment forecasting
+* Cross-platform validation (Reddit, Twitter)
+* Multilingual sentiment analysis
+* Emotion classification beyond polarity
+* Real-time monitoring dashboard for studios
 
 ---
 
